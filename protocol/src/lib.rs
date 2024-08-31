@@ -4,7 +4,6 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 
-use postcard::experimental::schema::Schema as PostcardSchema;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -12,7 +11,11 @@ mod game;
 pub use game::*;
 
 /// Messages from server session towards game.
-#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema, PostcardSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[cfg_attr(
+    feature = "postcard-schema",
+    derive(postcard::experimental::schema::Schema)
+)]
 pub enum SessionToGameEvent<ControllerToSessionCommand> {
     /// The session initially sends the randomly chosen ID of a game.
     SetId(String),
@@ -28,6 +31,10 @@ pub enum SessionToGameEvent<ControllerToSessionCommand> {
 
 /// Messages from server to a connected controller.
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema, PartialEq)]
+#[cfg_attr(
+    feature = "postcard-schema",
+    derive(postcard::experimental::schema::Schema)
+)]
 pub enum SessionToControllerEvent<GameToControllerEvent> {
     /// Push interval for the controller to use (in milliseconds).
     SetPushInterval(u32),
@@ -38,6 +45,10 @@ pub enum SessionToControllerEvent<GameToControllerEvent> {
 
 /// Messages from game towards server session.
 #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[cfg_attr(
+    feature = "postcard-schema",
+    derive(postcard::experimental::schema::Schema)
+)]
 pub struct GameToSessionMessage<GameToControllerEvent> {
     /// This message concerns the controller@id.
     pub id: u16,
@@ -57,6 +68,28 @@ pub struct Statistics {
 mod test {
     use super::*;
     use schemars::schema_for;
+
+    /// Convenience enum for all (server-)incoming messages.
+    #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+    #[cfg_attr(
+        feature = "postcard-schema",
+        derive(postcard::experimental::schema::Schema)
+    )]
+    enum IncomingProtocol {
+        ControllerToSessionCommand(ControllerToSessionCommand),
+        GameToSessionMessage(GameToSessionMessage<GameToControllerEvent>),
+    }
+
+    /// Convenience enum for all (server-)outgoing messages.
+    #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+    #[cfg_attr(
+        feature = "postcard-schema",
+        derive(postcard::experimental::schema::Schema)
+    )]
+    enum OutgoingProtocol {
+        SessionToGameEvent(SessionToGameEvent<ControllerToSessionCommand>),
+        SessionToControllerEvent(SessionToControllerEvent<GameToControllerEvent>),
+    }
 
     fn print_json_for<T>(elem: T)
     where
@@ -96,20 +129,6 @@ mod test {
 
     #[test]
     fn json_schemas() {
-        /// Convenience enum for all (server-)incoming messages.
-        #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
-        enum IncomingProtocol {
-            ControllerToSessionCommand(ControllerToSessionCommand),
-            GameToSessionMessage(GameToSessionMessage<GameToControllerEvent>),
-        }
-
-        /// Convenience enum for all (server-)outgoing messages.
-        #[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
-        enum OutgoingProtocol {
-            SessionToGameEvent(SessionToGameEvent<ControllerToSessionCommand>),
-            SessionToControllerEvent(SessionToControllerEvent<GameToControllerEvent>),
-        }
-
         print_json_schema_for::<IncomingProtocol>();
         print_json_schema_for::<OutgoingProtocol>();
     }
@@ -130,5 +149,15 @@ mod test {
     #[test_case::test_case(&[0] => ControllerToSessionCommand::Action1; "Action1")]
     fn controller_command_from_bytes(bytes: &[u8]) -> ControllerToSessionCommand {
         postcard::from_bytes(bytes).unwrap()
+    }
+
+    #[cfg(feature = "postcard-schema")]
+    #[test]
+    fn print_postcard_schema_for() {
+        use postcard::experimental::schema::Schema;
+
+        println!("{:#?}", IncomingProtocol::SCHEMA);
+        println!("{:#?}", OutgoingProtocol::SCHEMA);
+        println!("{:#?}", <(bool, &[f32])>::SCHEMA);
     }
 }
