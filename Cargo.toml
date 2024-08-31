@@ -1,18 +1,5 @@
-[package]
-name = "codec"
-version = "0.1.0"
-edition = "2021"
+[workspace]
 
-[lib]
-crate-type = ["cdylib"]
+resolver = "2"
 
-[dependencies]
-postcard = "1.0.8"
-protocol = { version = "0.1.0", path = "../protocol" }
-serde-wasm-bindgen = "0.6.5"
-wasm-bindgen = "0.2.93"
-
-[dev-dependencies]
-log = "0.4.22"
-wasm-bindgen-test = "0.3.0"
-wasm-logger = "0.2.0"
+members = ["protocol", "codec"]
