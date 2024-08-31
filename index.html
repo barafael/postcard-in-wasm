@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>JS postcard test</title>
+    <script>
+    </script>
+</head>
+
+<body>
+    <script type="module">
+        import init, { default as wasm, controller_command_to_bytes, controller_event_from_bytes } from './pkg/codec.js'
+
+        init().then(() => {
+            let message = controller_event_from_bytes([1, 1])
+            console.log(JSON.stringify(message))
+            let message_2 = controller_event_from_bytes([1, 2, 1])
+            console.log(JSON.stringify(message_2))
+
+            console.log(JSON.stringify(controller_command_to_bytes({
+                "Move": {
+                    x: 3.0,
+                    y: 1.0,
+                }
+            })))
+
+            console.log(JSON.stringify(controller_command_to_bytes({
+                "Action1": undefined
+            }
+            )))
+        });
+
+    </script>
+</body>
+
+</html>
