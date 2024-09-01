@@ -7,7 +7,7 @@ edition = "2021"
 postcard-schema = ["dep:postcard"]
 
 [dependencies]
-postcard = { git = "https://github.com/jamesmunns/postcard", features = [
+postcard = { version = "1", features = [
     "experimental-derive",
     "use-std",
 ], optional = true }
@@ -15,6 +15,6 @@ schemars = "0.8.21"
 serde = { version = "1", features = ["derive"] }
 
 [dev-dependencies]
-postcard = { git = "https://github.com/jamesmunns/postcard" }
+postcard = { version = "1" }
 serde_json = "1"
 test-case = "3.3.1"

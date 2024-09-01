@@ -55,7 +55,7 @@ name = "codec"
 version = "0.1.0"
 dependencies = [
  "log",
- "postcard 1.0.10 (registry+https://github.com/rust-lang/crates.io-index)",
+ "postcard",
  "protocol",
  "serde-wasm-bindgen",
  "wasm-bindgen",
@@ -180,16 +180,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f7f0a8d620d71c457dd1d47df76bb18960378da56af4527aaa10f515eee732e"
 dependencies = [
  "cobs",
- "heapless",
- "serde",
-]
-
-[[package]]
-name = "postcard"
-version = "1.0.10"
-source = "git+https://github.com/jamesmunns/postcard#f878536b80bfc2cce1ff0016f2c850740c99ae7b"
-dependencies = [
- "cobs",
  "embedded-io 0.4.0",
  "embedded-io 0.6.1",
  "heapless",
@@ -200,7 +190,8 @@ dependencies = [
 [[package]]
 name = "postcard-derive"
 version = "0.1.2"
-source = "git+https://github.com/jamesmunns/postcard#f878536b80bfc2cce1ff0016f2c850740c99ae7b"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0239fa9c1d225d4b7eb69925c25c5e082307a141e470573fbbe3a817ce6a7a37"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -220,7 +211,7 @@ dependencies = [
 name = "protocol"
 version = "0.1.0"
 dependencies = [
- "postcard 1.0.10 (git+https://github.com/jamesmunns/postcard)",
+ "postcard",
  "schemars",
  "serde",
  "serde_json",
